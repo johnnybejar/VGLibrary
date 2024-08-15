@@ -69,6 +69,8 @@ func login(c *gin.Context) {
 		return
 	}
 
+	// Placeholder for some sql logic that will be implemented later
+	
 	if username == "" && password == "" {
 		session.Set("user", username)
 		err := session.Save()
