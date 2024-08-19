@@ -5,7 +5,6 @@ type Game struct {
 	AggregatedRating      float32 `json:"aggregated_rating"`
 	AggregatedRatingCount int     `json:"aggregated_rating_count"`
 	AlternativeNames      []int   `json:"alternative_names"`
-	Artworks              []int   `json:"artworks"`
 	Category              int     `json:"category"`
 	Cover                 int     `json:"cover"`
 	CreatedAt             int     `json:"created_at"`
