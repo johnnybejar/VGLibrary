@@ -5,9 +5,7 @@ type Game struct {
 	AggregatedRating      float32 `json:"aggregated_rating"`
 	AggregatedRatingCount int     `json:"aggregated_rating_count"`
 	AlternativeNames      []int   `json:"alternative_names"`
-	Category              int     `json:"category"`
 	Cover                 int     `json:"cover"`
-	CreatedAt             int     `json:"created_at"`
 	ExternalGames         []int   `json:"external_games"`
 	Franchise             string  `json:"franchise"`
 	FirstReleaseDate      int     `json:"first_release_date"`

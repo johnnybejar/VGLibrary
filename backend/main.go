@@ -1,7 +1,11 @@
 package main
 
 import (
+	. "backend/models"
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -29,6 +33,7 @@ func main() {
 		priv.GET("/status", status)
 	}
 	priv.Use(AuthRequired())
+	router.SetTrustedProxies(nil)
 	router.Run("localhost:8000");
 }
 
@@ -47,16 +52,46 @@ func AuthRequired() gin.HandlerFunc {
 func getAccessToken(c *gin.Context) {
 	godotenv.Load("../.env")
 	CLIENT_ID := os.Getenv("TWITCH_CLIENT_ID")
-	CLIENT_SECRET := os.Getenv("TWITCH_ CLIENT_SECRET")
+	CLIENT_SECRET := os.Getenv("TWITCH_CLIENT_SECRET")
 	url := fmt.Sprintf("https://id.twitch.tv/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials", CLIENT_ID, CLIENT_SECRET)
-
-	res, err := http.Get(url)
-
+	
+	postBody, err := json.Marshal(&AccessToken{
+		AccessToken: "123",
+		ExpiresIn: 123,
+		TokenType: "123",
+	})
 	if err != nil {
-		c.JSON(http.StatusOK, res)
-	} else {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		log.Fatal(err);
 	}
+	
+	reader := bytes.NewReader(postBody)
+
+	res, err := http.Post(url, "", reader)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer res.Body.Close()
+
+	fmt.Println(res)
+
+	resBody, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if res.StatusCode >= 400 {
+		c.JSON(res.StatusCode, gin.H{"Error response, Status Code": res.StatusCode})
+		return
+	}
+
+	var body AccessToken
+	
+	if err := json.Unmarshal(resBody, &body); err != nil {
+		log.Fatal(err)
+	}
+
+	c.JSON(http.StatusOK, body)
 }
 
 func login(c *gin.Context) {
