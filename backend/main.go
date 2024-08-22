@@ -55,11 +55,7 @@ func getAccessToken(c *gin.Context) {
 	CLIENT_SECRET := os.Getenv("TWITCH_CLIENT_SECRET")
 	url := fmt.Sprintf("https://id.twitch.tv/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials", CLIENT_ID, CLIENT_SECRET)
 	
-	postBody, err := json.Marshal(&AccessToken{
-		AccessToken: "123",
-		ExpiresIn: 123,
-		TokenType: "123",
-	})
+	postBody, err := json.Marshal(&AccessToken{})
 	if err != nil {
 		log.Fatal(err);
 	}
@@ -72,8 +68,6 @@ func getAccessToken(c *gin.Context) {
 	}
 
 	defer res.Body.Close()
-
-	fmt.Println(res)
 
 	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
