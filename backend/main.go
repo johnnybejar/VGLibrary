@@ -24,6 +24,7 @@ func main() {
 
 	router.GET("/", func(ctx *gin.Context) {fmt.Println("GET path from root")})
 	router.GET("/access-token", getAccessToken).Use(AuthRequired())
+	router.POST("/register", register)
 	router.POST("/login", login)
 	router.GET("/logout", logout)
 	
@@ -86,6 +87,19 @@ func getAccessToken(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, body)
+}
+
+func register(c *gin.Context) {
+	email := c.PostForm("email")
+	username := c.PostForm("username")
+	password := c.PostForm("password")
+
+	/**
+		TODO: Confirm that the email/username are 
+		not already in the database
+	*/
+
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully registered."})
 }
 
 func login(c *gin.Context) {
