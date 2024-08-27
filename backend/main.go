@@ -1,6 +1,8 @@
 package main
 
 import (
+	"backend/initializers"
+	"backend/models"
 	. "backend/models"
 	"bytes"
 	"encoding/json"
@@ -15,6 +17,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
+
+func init() {
+	initializers.LoadEnvVariables()
+	initializers.DB()
+}
 
 func main() {
 	router := gin.Default()
@@ -91,7 +98,7 @@ func getAccessToken(c *gin.Context) {
 
 func register(c *gin.Context) {
 	email := c.PostForm("email")
-	username := c.PostForm("username")
+	name := c.PostForm("name")
 	password := c.PostForm("password")
 
 	/**
@@ -99,7 +106,14 @@ func register(c *gin.Context) {
 		not already in the database
 	*/
 
-	c.JSON(http.StatusOK, gin.H{"message": "Successfully registered."})
+	user := models.User{
+		Email: email,
+		Name: name,
+		Password: password,
+		
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully registered.", "result": user})
 }
 
 func login(c *gin.Context) {
