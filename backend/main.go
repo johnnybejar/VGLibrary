@@ -3,6 +3,7 @@ package main
 import (
 	"backend/controllers"
 	"backend/initializers"
+	"backend/middleware"
 	"backend/models"
 	"bytes"
 	"encoding/json"
@@ -26,10 +27,11 @@ func main() {
 	router := gin.Default()
 
 	router.GET("/", func(ctx *gin.Context) {fmt.Println("GET path from root")})
-	router.GET("/access-token", getAccessToken)
+	router.GET("/access-token", middleware.RequireAuth, getAccessToken)
 	router.POST("/register", controllers.Register)
 	router.POST("/login", controllers.Login)
 	router.GET("/logout", controllers.Logout)
+	router.GET("/validate", middleware.RequireAuth, controllers.Validate)
 	
 	router.SetTrustedProxies(nil)
 	router.Run("localhost:8000");

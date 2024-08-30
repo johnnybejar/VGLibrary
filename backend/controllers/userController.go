@@ -129,3 +129,11 @@ func Login(c *gin.Context) {
 }
 
 func Logout(c *gin.Context) {}
+
+func Validate(c *gin.Context) {
+	user, _ := c.Get("user")
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": user,
+	})
+}
