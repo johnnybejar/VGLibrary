@@ -27,6 +27,7 @@ func main() {
 
 	// API Routes
 	router.GET("/access-token", middleware.RequireAuth, controllers.GetAccessToken)
+	router.GET("/game", middleware.RequireAuth, controllers.GetGame)
 	
 	router.SetTrustedProxies(nil)
 	router.Run("localhost:8000");
