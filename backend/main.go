@@ -18,12 +18,15 @@ func init() {
 func main() {
 	router := gin.Default()
 
+	// Auth Routes
 	router.GET("/", func(ctx *gin.Context) {fmt.Println("GET path from root")})
-	router.GET("/access-token", middleware.RequireAuth, controllers.GetAccessToken)
 	router.POST("/register", controllers.Register)
 	router.POST("/login", controllers.Login)
 	router.GET("/logout", middleware.RequireAuth, controllers.Logout)
 	router.GET("/validate", middleware.RequireAuth, controllers.Validate)
+
+	// API Routes
+	router.GET("/access-token", middleware.RequireAuth, controllers.GetAccessToken)
 	
 	router.SetTrustedProxies(nil)
 	router.Run("localhost:8000");
