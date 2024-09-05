@@ -17,3 +17,9 @@ type Game struct {
 	Summary               string  `json:"summary"`
 	Url                   string  `json:"url"`
 }
+
+type Cover struct {
+	Id      int    `json:"id"`
+	Game    int    `json:"game"`
+	ImageId string `json:"image_id"`
+}
