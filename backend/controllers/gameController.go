@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -53,29 +54,68 @@ func GetAccessToken(c *gin.Context) {
 }
 
 func GetGame(c *gin.Context) {
-	token, err := c.Cookie("IGDBAccessToken")
+	CLIENT_ID := os.Getenv("TWITCH_CLIENT_ID")
+	bearer, err := c.Cookie("IGDBAccessToken")
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "Not authorized",
 		})
 	}
 
-	url := "https://api.igdb.com/v4/games"
-	jsonData, err := io.ReadAll(c.Request.Body)
-	body := fmt.Sprintf("fields id, aggregated_rating, aggregated_rating_count, alternative_names, collections, cover, game_modes, genres, involved_companies, name, platforms, first_release_date, slug, summary, url; where id = %s;", string(jsonData))
+	bearer = "Bearer " + bearer
 
-	postBody, err := json.Marshal(&models.Game{})
+	jsonData, err := io.ReadAll(c.Request.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	reader := bytes.NewReader(postBody)
+	url := "https://api.igdb.com/v4/games"
+	reqBody := fmt.Sprintf("fields id, aggregated_rating, aggregated_rating_count, alternative_names, collections, cover, game_modes, genres, involved_companies, name, platforms, first_release_date, slug, summary, url; where id = %s;", string(jsonData))
+
+	// postBody, err := json.Marshal(&models.Game{})
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	reader := bytes.NewReader([]byte(reqBody))
 
 	req, err := http.NewRequest("POST", url, reader)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	req.Header.Set("Client-ID", token)
+	req.Header.Set("Client-ID", CLIENT_ID)
+	req.Header.Add("Authorization", bearer)
+
+	client := &http.Client{Timeout: 10 * time.Second}
+
+	res, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer res.Body.Close()
+
+	var game []models.Game
+	
+	switch {
+		case res.StatusCode == 401:
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "Not authorized",
+			})
+		case res.StatusCode >= 400:
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Bad request",
+			})
+		default:
+			err := json.NewDecoder(res.Body).Decode(&game)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			c.JSON(http.StatusOK, gin.H{
+				"response": game[0],
+			})
+	}
 
 }
