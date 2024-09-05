@@ -20,15 +20,21 @@ func main() {
 
 	// Auth Routes
 	router.GET("/", func(ctx *gin.Context) {fmt.Println("GET path from root")})
-	router.POST("/register", controllers.Register)
-	router.POST("/login", controllers.Login)
-	router.GET("/logout", middleware.RequireAuth, controllers.Logout)
-	router.GET("/validate", middleware.RequireAuth, controllers.Validate)
+	auth := router.Group("/auth")
+	{
+		auth.POST("/register", controllers.Register)
+		auth.POST("/login", controllers.Login)
+		auth.GET("/logout", middleware.RequireAuth, controllers.Logout)
+		auth.GET("/validate", middleware.RequireAuth, controllers.Validate)
+	}
 
 	// API Routes
-	router.GET("/access-token", middleware.RequireAuth, controllers.GetAccessToken)
-	router.GET("/game", middleware.RequireAuth, controllers.GetGame)
-	router.GET("/cover", middleware.RequireAuth, controllers.GetGameCover)
+	igdb := router.Group("/igdb")
+	{
+		igdb.GET("/access-token", middleware.RequireAuth, controllers.GetAccessToken)
+		igdb.GET("/game", middleware.RequireAuth, controllers.GetGame)
+		igdb.GET("/cover", middleware.RequireAuth, controllers.GetGameCover)
+	}
 	
 	router.SetTrustedProxies(nil)
 	router.Run("localhost:8000")
