@@ -4,7 +4,6 @@ type Game struct {
 	Id                    int     `json:"id"`
 	AggregatedRating      float32 `json:"aggregated_rating"`
 	AggregatedRatingCount int     `json:"aggregated_rating_count"`
-	AlternativeNames      []int   `json:"alternative_names"`
 	Collections           []int   `json:"collections"` // Refers to franchise of the game
 	Cover                 int     `json:"cover"`
 	GameModes             []int   `json:"game_modes"`

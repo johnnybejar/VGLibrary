@@ -70,7 +70,7 @@ func GetGame(c *gin.Context) {
 	}
 
 	url := "https://api.igdb.com/v4/games"
-	reqBody := fmt.Sprintf("fields id, aggregated_rating, aggregated_rating_count, alternative_names, collections, cover, game_modes, genres, involved_companies, name, platforms, first_release_date, slug, summary, url; where id = %s;", string(jsonData))
+	reqBody := fmt.Sprintf("fields id, aggregated_rating, aggregated_rating_count, collections, cover, game_modes, genres, involved_companies, name, platforms, first_release_date, slug, summary, url; where id = %s;", string(jsonData))
 
 	reader := bytes.NewReader([]byte(reqBody))
 
@@ -192,7 +192,7 @@ func SearchGames(c *gin.Context) {
 	}
 
 	url := "https://api.igdb.com/v4/games"
-	reqBody := fmt.Sprintf("fields id, aggregated_rating, aggregated_rating_count, alternative_names, collections, cover, game_modes, genres, involved_companies, name, platforms, first_release_date, slug, summary, url; search \"%s\";", string(jsonData))
+	reqBody := fmt.Sprintf("fields id, aggregated_rating, aggregated_rating_count, collections, cover, game_modes, genres, involved_companies, name, platforms, first_release_date, slug, summary, url; search \"%s\";", string(jsonData))
 
 	reader := bytes.NewReader([]byte(reqBody))
 
