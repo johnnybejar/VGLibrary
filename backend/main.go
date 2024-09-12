@@ -34,6 +34,7 @@ func main() {
 		igdb.GET("/access-token", middleware.RequireAuth, controllers.GetAccessToken)
 		igdb.GET("/game", middleware.RequireAuth, controllers.GetGame)
 		igdb.GET("/cover", middleware.RequireAuth, controllers.GetGameCover)
+		igdb.GET("/search", middleware.RequireAuth, controllers.SearchGames)
 	}
 	
 	router.SetTrustedProxies(nil)
