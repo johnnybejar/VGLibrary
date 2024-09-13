@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"backend/initializers"
 	"backend/models"
 	"bytes"
 	"encoding/json"
@@ -237,5 +238,26 @@ func SearchGames(c *gin.Context) {
 }
 
 func WriteGame(c *gin.Context) {
-	
+	var game models.Game
+
+	if c.Bind(&game) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"Error": "Failed to read body",
+		})
+
+		return
+	}
+
+	res := initializers.DB.Create(&game)
+	if res.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"Error": "Failure to create game",
+			"Code": res.Error,
+		})
+
+		initializers.DB.Delete("")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
 }
