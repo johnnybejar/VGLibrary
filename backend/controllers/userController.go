@@ -52,6 +52,8 @@ func Register(c *gin.Context) {
 	if res.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"Error": "Failed to create user",
+			// This error code will be used to tell the client what caused the error, like for duplicate entry (1062)
+			"Code": res.Error,
 		})
 
 		initializers.DB.Delete("")

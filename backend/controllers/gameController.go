@@ -235,3 +235,7 @@ func SearchGames(c *gin.Context) {
 			})
 	}
 }
+
+func WriteGame(c *gin.Context) {
+	
+}
