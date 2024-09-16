@@ -37,6 +37,13 @@ func main() {
 		igdb.GET("/search", middleware.RequireAuth, controllers.SearchGames)
 	}
 	
+	// DB Routes
+	db := router.Group("/db")
+	{
+		db.POST("/create-game", controllers.WriteGame)
+		db.GET("/game")
+	}
+	
 	router.SetTrustedProxies(nil)
 	router.Run("localhost:8000")
 }

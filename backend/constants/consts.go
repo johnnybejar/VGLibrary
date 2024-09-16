@@ -1,6 +1,6 @@
 package constants
 
-func getGenres() map[int]string {
+func GetGenres() map[int]string {
 	return map[int]string{
 		2:  "Point-and-click",
 		4:  "Fighting",
@@ -25,5 +25,14 @@ func getGenres() map[int]string {
 		34: "Visual Novel",
 		35: "Card & Board Game",
 		36: "MOBA",
+	}
+}
+
+func GetGameModes() map[int]string {
+	return map[int]string{
+		1: "",
+		2: "",
+		3: "",
+		4: "",
 	}
 }

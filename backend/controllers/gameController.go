@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"backend/initializers"
+	"backend/constants"
 	"backend/models"
 	"bytes"
 	"encoding/json"
@@ -247,17 +247,112 @@ func WriteGame(c *gin.Context) {
 
 		return
 	}
+	
+	// Here, we have to make a few API calls to igdb to get more info about the game
+	// This is to avoid having to make potentially hundreds of calls later
 
-	res := initializers.DB.Create(&game)
-	if res.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"Error": "Failure to create game",
-			"Code": res.Error,
+	// 1. Collection
+	var collection models.Collections = WriteGameHelper(c, "collections", "name").(models.Collections)
+	fmt.Println(collection)
+
+	// 2. Cover
+	var cover models.Cover = WriteGameHelper(c, "covers", "game, image_id").(models.Cover)
+	fmt.Println(cover)
+
+	// 3. Game Modes
+	gameModes := constants.GetGameModes()
+	var gameModesString []string
+
+	for i := 0; i < len(game.GameModes); i++ {
+		gameModesString = append(gameModesString, gameModes[i])
+	}
+	fmt.Println(gameModesString)
+
+	// 4. Genres
+	genres := constants.GetGenres()
+	var genresString []string
+	
+	for i := 0; i < len(game.Genres); i++ {
+		genresString = append(genresString, genres[i])
+	}
+	fmt.Println(genresString)
+
+	// 5. Companies (2 calls)
+
+	// 6. Platforms
+
+	fmt.Println(game)
+
+	// res := initializers.DB.Create(&game)
+	// if res.Error != nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{
+	// 		"Error": "Failure to create game",
+	// 		"Code": res.Error,
+	// 	})
+
+	// 	initializers.DB.Delete("")
+	// 	return
+	// }
+
+	c.JSON(http.StatusOK, gin.H{
+		"game": game,
+	})
+}
+
+func WriteGameHelper(c *gin.Context, route string, fields string) interface{} {
+	CLIENT_ID := os.Getenv("TWITCH_CLIENT_ID")
+	bearer, err := c.Cookie("IGDBAccessToken")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Not authorized",
 		})
-
-		initializers.DB.Delete("")
-		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{})
+	bearer = "Bearer " + bearer
+
+	jsonData, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	reqBody := fmt.Sprintf("fields %s; where id = %s;", fields, string(jsonData))
+
+	reader := bytes.NewReader([]byte(reqBody))
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("https://api.igdb.com/v4/%s", route), reader)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	req.Header.Set("Client-ID", CLIENT_ID)
+	req.Header.Add("Authorization", bearer)
+
+	client := &http.Client{Timeout: 10 * time.Second}
+
+	res, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer res.Body.Close()
+
+	var obj []interface{}
+	
+	switch {
+		case res.StatusCode == 401:
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "Not authorized",
+			})
+		case res.StatusCode >= 400:
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Bad request",
+			})
+		default:
+			err := json.NewDecoder(res.Body).Decode(&obj)
+			if err != nil {
+				log.Fatal(err)
+			}
+	}
+
+	return obj[0]
 }
