@@ -253,11 +253,11 @@ func WriteGame(c *gin.Context) {
 	// TODO: Some games will have empty fields, so handle those cases
 
 	// 1. Collection
-	var collection models.Collections = WriteGameHelper(c, "collections", "name").(models.Collections)
+	var collection = WriteGameHelper(c, "collections", "name", fmt.Sprint(game.Collections[0]))
 	fmt.Println(collection)
 
 	// 2. Cover
-	var cover models.Cover = WriteGameHelper(c, "covers", "game, image_id").(models.Cover)
+	var cover = WriteGameHelper(c, "covers", "game, image_id", fmt.Sprint(game.Cover))
 	fmt.Println(cover)
 
 	// 3. Game Modes
@@ -279,9 +279,15 @@ func WriteGame(c *gin.Context) {
 	fmt.Println(genresString)
 
 	// 5. Companies (2 calls)
-
+	// Some games will have multiple involved companies (developer, publishers, etc.), 
+	// so we'll only care about the first id
+	// var involvedCompany = WriteGameHelper(c, "involved_companies", "id, company, game", fmt.Sprint(game.InvolvedCompanies[0]))
+	// var company = WriteGameHelper(c, "companies", "id, name", fmt.Sprint(involvedCompany.CompanyId))
+	// fmt.Println(company)
 
 	// 6. Platforms
+	var platform = WriteGameHelper(c, "", "", fmt.Sprint(game.Platforms[0]))
+	fmt.Println(platform)
 
 	fmt.Println(game)
 
@@ -301,7 +307,7 @@ func WriteGame(c *gin.Context) {
 	})
 }
 
-func WriteGameHelper(c *gin.Context, route string, fields string) interface{} {
+func WriteGameHelper(c *gin.Context, route string, fields string, id string) interface{} {
 	CLIENT_ID := os.Getenv("TWITCH_CLIENT_ID")
 	bearer, err := c.Cookie("IGDBAccessToken")
 	if err != nil {
@@ -312,13 +318,7 @@ func WriteGameHelper(c *gin.Context, route string, fields string) interface{} {
 
 	bearer = "Bearer " + bearer
 
-	jsonData, err := io.ReadAll(c.Request.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	reqBody := fmt.Sprintf("fields %s; where id = %s;", fields, string(jsonData))
-
+	reqBody := fmt.Sprintf("fields %s; where id = %s;", fields, id)
 	reader := bytes.NewReader([]byte(reqBody))
 
 	req, err := http.NewRequest("POST", fmt.Sprintf("https://api.igdb.com/v4/%s", route), reader)
