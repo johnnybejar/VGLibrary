@@ -250,6 +250,7 @@ func WriteGame(c *gin.Context) {
 	
 	// Here, we have to make a few API calls to igdb to get more info about the game
 	// This is to avoid having to make potentially hundreds of calls later
+	// TODO: Some games will have empty fields, so handle those cases
 
 	// 1. Collection
 	var collection models.Collections = WriteGameHelper(c, "collections", "name").(models.Collections)
@@ -278,6 +279,7 @@ func WriteGame(c *gin.Context) {
 	fmt.Println(genresString)
 
 	// 5. Companies (2 calls)
+
 
 	// 6. Platforms
 
