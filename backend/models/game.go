@@ -26,8 +26,8 @@ type GameDB struct {
 	Collections           string  `json:"collections"` // Refers to franchise of the game
 	Company               string
 	Cover                 int      `json:"cover"`
-	GameModesString       []string // Declared after added to list
-	GenresString          []string // Declared after added to list
+	GameModes             []string // Declared after added to list
+	Genres                []string // Declared after added to list
 	Name                  string   `json:"name"`
 	Platform              string
 	ReleaseDate           int    `json:"first_release_date"`

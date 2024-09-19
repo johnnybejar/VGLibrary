@@ -251,9 +251,18 @@ func WriteGame(c *gin.Context) {
 	// Here, we have to make a few API calls to igdb to get more info about the game
 	// This is to avoid having to make potentially hundreds of calls later
 	// TODO: Some games will have empty fields, so handle those cases
+	var gameDB models.GameDB
+	gameDB.AggregatedRating = game.AggregatedRating
+	gameDB.AggregatedRatingCount = game.AggregatedRatingCount
+	gameDB.Id = game.Id
+	gameDB.Name = game.Name
+	gameDB.ReleaseDate = game.ReleaseDate
+	gameDB.Slug = game.Slug
+	gameDB.Summary = game.Summary
+	gameDB.Url = game.Url
 
 	// 1. Collection
-	var collection = WriteGameHelper(c, "collections", "name", fmt.Sprint(game.Collections[0]))
+	var collection = WriteGameHelper(c, "collections", "name", fmt.Sprint(game.Collections[0])).(models.Collections)
 	fmt.Println(collection)
 
 	// 2. Cover
@@ -286,7 +295,7 @@ func WriteGame(c *gin.Context) {
 	// fmt.Println(company)
 
 	// 6. Platforms
-	var platform = WriteGameHelper(c, "", "", fmt.Sprint(game.Platforms[0]))
+	var platform = WriteGameHelper(c, "platforms", "name", fmt.Sprint(game.Platforms[0]))
 	fmt.Println(platform)
 
 	fmt.Println(game)
@@ -351,6 +360,7 @@ func WriteGameHelper(c *gin.Context, route string, fields string, id string) int
 			})
 		default:
 			err := json.NewDecoder(res.Body).Decode(&obj)
+			fmt.Printf("Decoded body: %s", obj)
 			if err != nil {
 				log.Fatal(err)
 			}
