@@ -29,9 +29,10 @@ func main() {
 	}
 
 	// API Routes
-	igdb := router.Group("/giantbomb")
+	giantbomb := router.Group("/giantbomb")
 	{
-		igdb.GET("/game", middleware.RequireAuth, controllers.GetGame)
+		giantbomb.GET("/game", middleware.RequireAuth, controllers.GetGame)
+		giantbomb.GET("/search", middleware.RequireAuth, controllers.SearchGames)
 	}
 	
 	// DB Routes
