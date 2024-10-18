@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"backend/models"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -11,11 +10,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// TODO: Type the responses and filter out any unused data
+
 func GetGame(c *gin.Context) {
 	API_KEY := os.Getenv("API_KEY")
 	queryString := c.Query("id")
 
-	url := fmt.Sprintf("https://www.giantbomb.com/api/game/%s/?api_key=%s&format=json", queryString, API_KEY)
+	url := fmt.Sprintf("https://www.giantbomb.com/api/game/%s?api_key=%s&format=json", queryString, API_KEY)
 
 	res, err := http.Get(url)
 	if err != nil {
@@ -24,7 +25,9 @@ func GetGame(c *gin.Context) {
 
 	defer res.Body.Close()
 
-	var game []models.Game
+	var game interface{}
+
+	fmt.Println(res.StatusCode)
 	
 	switch {
 		case res.StatusCode == 401:
@@ -42,7 +45,7 @@ func GetGame(c *gin.Context) {
 			}
 
 			c.JSON(http.StatusOK, gin.H{
-				"response": game[0],
+				"response": game,
 			})
 	}
 }
@@ -51,7 +54,7 @@ func SearchGames(c *gin.Context) {
 	API_KEY := os.Getenv("API_KEY")
 	search := c.Query("search")
 
-	url := fmt.Sprintf("https://www.giantbomb.com/api/search/?api_key=%s&format=json&query=%s", API_KEY, search)
+	url := fmt.Sprintf("https://www.giantbomb.com/api/search?api_key=%s&format=json&query=%s", API_KEY, search)
 
 	res, err := http.Get(url)
 	if err != nil {
@@ -60,7 +63,7 @@ func SearchGames(c *gin.Context) {
 
 	defer res.Body.Close()
 
-	var game []models.Game
+	var game interface{}
 	
 	switch {
 		case res.StatusCode == 401:
